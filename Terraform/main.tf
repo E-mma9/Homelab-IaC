@@ -1,27 +1,39 @@
-resource "proxmox_virtual_environment_vm" "debian_vm" {
-  name      = "test-debian"
+resource "proxmox_virtual_environment_container" "test_container" {
   node_name = "pve"
-  
-
-  # should be true if qemu agent is not installed / enabled on the VM
-  stop_on_destroy = true
+  count = 5
+  unprivileged = true
+  features {
+    nesting = true
+  }
 
   initialization {
-    user_account {
-      # do not use this in production, configure your own ssh key instead!
-      username = "user"
-      password = "password"
+    hostname = "Test-container"
+
+    ip_config {
+      ipv4 {
+        address = "dhcp"
+      }
     }
+
+    user_account {
+
+      password = "emmanuel"
+    }
+  }
+
+  network_interface {
+    name = "eth0"
+    bridge = "vmbr0"
   }
 
   disk {
     datastore_id = "local-lvm"
-    # qcow2 image downloaded from https://cloud.debian.org/images/cloud/bookworm/latest/ and renamed to *.img
-    # the image is not of import type, so provider will use SSH client to import it
-    file_id   = "local:iso/ubuntu-26.04-live-server-amd64.iso"
-    interface = "virtio0"
-    iothread  = true
-    discard   = "on"
-    size      = 20
+    size         = 4
+  }
+
+   operating_system {
+    template_file_id = "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
   }
 }
+
+
