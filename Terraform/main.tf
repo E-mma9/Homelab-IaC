@@ -1,28 +1,20 @@
 resource "proxmox_virtual_environment_container" "test_container" {
-  node_name = "pve"
-  count = 5
+  node_name    = "pve"
   unprivileged = true
-  features {
-    nesting = true
+
+  clone {
+    vm_id = 9000
   }
 
   initialization {
-    hostname = "Test-container"
-
+    hostname = "test-container"
     ip_config {
-      ipv4 {
-        address = "dhcp"
-      }
-    }
-
-    user_account {
-
-      password = "emmanuel"
+      ipv4 { address = "dhcp" }
     }
   }
 
   network_interface {
-    name = "eth0"
+    name   = "eth0"
     bridge = "vmbr0"
   }
 
@@ -31,9 +23,7 @@ resource "proxmox_virtual_environment_container" "test_container" {
     size         = 4
   }
 
-   operating_system {
-    template_file_id = "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
+  features {
+    nesting = true
   }
 }
-
-
